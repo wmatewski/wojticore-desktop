@@ -6,6 +6,7 @@
 - Changes under `backend/**` or `cloudbuild/**` also start the Cloud Build trigger and deploy the backend after the main push.
 - RPM changes build only the changed package and the transitive RPM consumers whose exact dependency versions must match. A change to `glass-ui` rebuilds its consumers; a `glass-hyprland-config`-only change builds that package alone.
 - Pushes to `main` publish selected RPMs to Development. Tags `vX.Y.Z` publish selected RPMs to Stable; the tag must point to a commit on `main`.
+- Development RPMs are served from the uncached `repos/development-v2/` path so DNF cannot pair a cached `repomd.xml` with a different detached signature. Stable keeps its existing path.
 - Frontend pushes deploy only when the `DEPLOY_FRONTEND` environment variable is `true`.
 
 The publisher exports the imported key's public half to the bucket, then downloads the existing channel repository before regenerating its DNF metadata, so publishing one module retains previously published packages. RPMs and repository metadata are signed before the channel manifest is updated.
