@@ -16,7 +16,7 @@ assert_selection() {
   git -C "$work" -c user.name=Test -c user.email=test@example.invalid commit -qm change
   local head actual
   head="$(git -C "$work" rev-parse HEAD)"
-  actual="$(cd "$work" && "$root/scripts/changed-rpms.sh" "$base" "$head")"
+  actual="$(cd "$work" && env -u GITHUB_OUTPUT "$root/scripts/changed-rpms.sh" "$base" "$head")"
   [[ "$actual" == "$expected" ]] || { printf 'Expected %s, got %s for %s\n' "$expected" "$actual" "$path" >&2; exit 1; }
   base="$head"
 }
