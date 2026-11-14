@@ -47,6 +47,8 @@ The Doppler project/config used by the publishing workflows must contain:
 | `RPM_GPG_PRIVATE_KEY` | ASCII-armored private key used to sign RPM packages and repository metadata |
 | `RPM_GPG_KEY_ID` | GPG key ID matching the signing key |
 
+The publishing workflow exports the matching public key to `gs://<bucket>/keys/RPM-GPG-KEY-wojticore`, the object used by the generated DNF repository configuration.
+
 Do not put a Google Cloud JSON key in Doppler. The current API reads only public release manifests from GCS and does not require another application secret. Keep the service token read-only and scoped to the config containing the signing material; use a separate restricted runtime token/config if the API later needs private Doppler values.
 
 ## GitHub Actions variables and environment
