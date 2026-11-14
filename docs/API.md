@@ -4,7 +4,7 @@ Base URL: https://api.desktop.wojticore.eu
 
 ## Health
 
-GET /healthz returns 200 {"status":"ok"}. This reports process health and does not call GCS.
+GET /health returns 200 {"status":"ok"}. This reports process health and does not call GCS.
 
 ## Latest release
 

@@ -16,7 +16,7 @@ const store = (value: unknown | null | Error): ReleaseStore => ({
 
 test('health responds without touching GCS', async () => {
   const app = createApp(store(new Error('unavailable')));
-  const response = await app.inject('/healthz');
+  const response = await app.inject('/health');
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.json(), { status: 'ok' });
   await app.close();

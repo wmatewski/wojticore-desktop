@@ -33,7 +33,7 @@ gcloud builds repositories create wojticore-desktop \
   --project=wojticore-dev
 ```
 
-The deploy trigger uses `cloudbuild/production.yaml`, and its included file filter is `backend/**,cloudbuild/**`. The config builds the backend container, pushes the commit-SHA image to Artifact Registry, deploys Cloud Run with the runtime identity, and verifies `/healthz`.
+The deploy trigger uses `cloudbuild/production.yaml`, and its included file filter is `backend/**,cloudbuild/**`. The config builds the backend container, pushes the commit-SHA image to Artifact Registry, deploys Cloud Run with the runtime identity, and verifies `/health`.
 
 ## Doppler secrets
 
@@ -69,4 +69,4 @@ The protected `prd` environment must provide these variables to its publishing j
 - Confirm Cloud Run uses the runtime identity, bucket name, and `DOPPLER_DESKTOP_TOKEN` secret reference.
 - Confirm anonymous users can download release objects but cannot upload.
 - Bucket versioning allows restoring older DNF metadata and `channels/<channel>/<architecture>/latest.json` generations.
-- Cloud Run `/healthz` does not require GCS; release endpoints return `503` if GCS is unavailable.
+- Cloud Run `/health` does not require GCS; release endpoints return `503` if GCS is unavailable.
