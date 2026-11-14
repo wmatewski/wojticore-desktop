@@ -13,7 +13,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - name: Check out tags and history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Validate version tag and main ancestry
@@ -45,7 +45,7 @@ jobs:
     container: fedora:latest
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install RPM tools
         run: dnf install -y rpm-build
       - name: Build selected RPM packages
@@ -72,7 +72,7 @@ jobs:
       id-token: write
     steps:
       - name: Check out publication scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Google Cloud Workload Identity Federation
         uses: google-github-actions/auth@v3
         with:

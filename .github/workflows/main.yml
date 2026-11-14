@@ -18,7 +18,7 @@ jobs:
       rpms: ${{ steps.rpms.outputs.packages }}
     steps:
       - name: Check out complete history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Select changed areas
@@ -59,7 +59,7 @@ jobs:
         working-directory: backend
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Validate shell scripts
         run: bash -n installer/install.sh scripts/*.sh
       - name: Test RPM dependency selection
@@ -99,7 +99,7 @@ jobs:
         working-directory: frontend
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
@@ -129,7 +129,7 @@ jobs:
     container: fedora:latest
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install RPM tools
         run: dnf install -y rpm-build
       - name: Build selected RPM packages
@@ -157,7 +157,7 @@ jobs:
       id-token: write
     steps:
       - name: Check out publication scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Google Cloud Workload Identity Federation
         uses: google-github-actions/auth@v3
         with:
@@ -206,7 +206,7 @@ jobs:
         working-directory: frontend
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
