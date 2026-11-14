@@ -2,7 +2,7 @@
 
 ## Workflows
 
-- `Main CI` runs on pull requests and pushes to `main`. It checks backend, frontend and RPMs only when their files changed. The `Main CI / gate` check is required for merging.
+- `Main CI` runs on pull requests and pushes to `main`. Pull requests check only changed components; every push to `main` builds the backend, frontend and all RPMs, then publishes the RPMs to Development. The `Main CI / gate` check is required for merging.
 - Changes under `backend/**` or `cloudbuild/**` also start the Cloud Build trigger and deploy the backend after the main push.
 - RPM changes build only the changed package and the transitive RPM consumers whose exact dependency versions must match. A change to `glass-ui` rebuilds its consumers; a `glass-hyprland-config`-only change builds that package alone.
 - Pushes to `main` publish selected RPMs to Development. Tags `vX.Y.Z` publish selected RPMs to Stable; the tag must point to a commit on `main`.
