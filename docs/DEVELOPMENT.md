@@ -31,7 +31,7 @@ On Fedora:
 
 Output is written to dist/rpms. The build script scans each packages/*/*.spec, creates a source tarball and builds each package independently. To sign locally, import the RPM GPG key into your GPG keyring and set RPM_SIGNING_KEY_ID before running the build.
 
-glass-session copies the shipped Hyprland config only when ~/.config/wojticore-glass/hyprland.conf is absent. It runs Hyprland with that separate config path; it does not source or rewrite the user's ordinary Hyprland config.
+glass-session copies the shipped Lua config only when ~/.config/wojticore-glass/hyprland.lua is absent. If an older Glass config exists, it keeps a `.legacy-backup` copy and starts with the supported Lua defaults. It runs `start-hyprland` when available and does not source or rewrite the user's ordinary Hyprland config.
 
 ## Quickshell
 

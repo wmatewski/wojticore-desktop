@@ -2,10 +2,16 @@
 set -euo pipefail
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/wojticore-glass"
-config_file="$config_dir/hyprland.conf"
+config_file="$config_dir/hyprland.lua"
 install -d -m 700 "$config_dir"
 if [[ ! -e "$config_file" ]]; then
-  install -m 600 /usr/share/wojticore-glass/default-hyprland.conf "$config_file"
+  if [[ -e "$config_dir/hyprland.conf" ]]; then
+    cp -n "$config_dir/hyprland.conf" "$config_dir/hyprland.conf.legacy-backup"
+  fi
+  install -m 600 /usr/share/wojticore-glass/default-hyprland.lua "$config_file"
 fi
 export QML_IMPORT_PATH="/usr/share/wojticore-glass/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+if command -v start-hyprland >/dev/null 2>&1; then
+  exec start-hyprland -- --config "$config_file"
+fi
 exec Hyprland --config "$config_file"

@@ -9,6 +9,7 @@ Requires:       hyprland
 Requires:       glass-shell = %{version}-%{release}
 Recommends:     swaybg
 Recommends:     kitty
+Recommends:     hyprland-qtutils
 
 %description
 Adds a distinct Glass Desktop login session and per-user first-run config without modifying existing Hyprland settings.
@@ -22,11 +23,11 @@ Adds a distinct Glass Desktop login session and per-user first-run config withou
 install -d %{buildroot}/usr/bin %{buildroot}/usr/share/wayland-sessions %{buildroot}/usr/share/wojticore-glass
 install -m 0755 files/glass-session %{buildroot}/usr/bin/glass-session
 install -m 0644 files/glass.desktop %{buildroot}/usr/share/wayland-sessions/glass.desktop
-install -m 0644 files/default-hyprland.conf %{buildroot}/usr/share/wojticore-glass/default-hyprland.conf
+install -m 0644 files/default-hyprland.lua %{buildroot}/usr/share/wojticore-glass/default-hyprland.lua
 install -m 0644 files/glass-wallpaper.png %{buildroot}/usr/share/wojticore-glass/glass-wallpaper.png
 
 %files
 /usr/bin/glass-session
 /usr/share/wayland-sessions/glass.desktop
-/usr/share/wojticore-glass/default-hyprland.conf
+/usr/share/wojticore-glass/default-hyprland.lua
 /usr/share/wojticore-glass/glass-wallpaper.png

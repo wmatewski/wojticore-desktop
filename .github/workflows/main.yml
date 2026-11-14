@@ -35,7 +35,7 @@ jobs:
           BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
         run: |
-          if [[ "$EVENT_NAME" == workflow_dispatch || -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
+          if [[ "$EVENT_NAME" == push || "$EVENT_NAME" == workflow_dispatch || -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]]; then
             printf 'backend=true\nfrontend=true\n' >> "$GITHUB_OUTPUT"
             echo ALL > "$RUNNER_TEMP/change-base"
             exit 0
