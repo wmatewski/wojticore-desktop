@@ -12,7 +12,7 @@ PanelWindow {
     property int activeWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
     property var currentTime: new Date()
     color: "transparent"
-    exclusionMode: ExclusionMode.Exclusive
+    exclusionMode: ExclusionMode.Auto
 
     Timer { interval: 1000; running: true; repeat: true; onTriggered: panel.currentTime = new Date() }
 
