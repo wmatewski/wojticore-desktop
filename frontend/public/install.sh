@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-channel="${CHANNEL:-development}"
-releases_bucket=wojticore-desktop-releases
+channel="${CHANNEL:-stable}"
+releases_bucket=wojticore-desktop-releases-dev-952788006008
 if [[ -v RELEASES_BUCKET ]]; then releases_bucket="$RELEASES_BUCKET"; fi
 [[ "$releases_bucket" =~ ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$ ]] || { echo "Invalid GCS bucket name: $releases_bucket" >&2; exit 2; }
 case "$channel" in stable|development) ;; *) echo 'CHANNEL must be stable or development.' >&2; exit 2 ;; esac
@@ -41,6 +41,6 @@ if [[ ! -e "$repo_file" ]] || [[ "$(cat "$repo_file")" != "$expected" ]]; then
   mv -f "$temp_file" "$repo_file"
 fi
 
-dnf --refresh install -y glass-desktop
+dnf --refresh --disablerepo='wojticore-desktop-*' --enablerepo="wojticore-desktop-${channel}" install -y glass-desktop
 printf '\nGlass Desktop has been installed. Select “Glass Desktop” from your login screen.\n'
 printf 'Existing desktop sessions and user configuration were left in place.\n'
