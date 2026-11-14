@@ -6,8 +6,8 @@ import Quickshell.Widgets
 import GlassUI
 
 PanelWindow {
-    anchors { left: true; right: true; bottom: true }
-    margins { left: (screen.width - implicitWidth) / 2; right: (screen.width - implicitWidth) / 2; bottom: 8 }
+    anchors { left: true; bottom: true }
+    margins { left: (screen.width - implicitWidth) / 2; bottom: 8 }
     implicitWidth: dockRow.implicitWidth + 24
     implicitHeight: 58
     color: "transparent"
@@ -25,13 +25,14 @@ PanelWindow {
             anchors.centerIn: parent
             spacing: 7
             Repeater {
-                model: ["firefox.desktop", "org.gnome.Terminal.desktop", "org.gnome.Nautilus.desktop", "org.gnome.TextEditor.desktop"]
+                model: ["Firefox", "Terminal", "Files", "Text Editor"]
                 delegate: Button {
                     required property string modelData
-                    property var entry: DesktopEntries.byId(modelData)
+                    property var entry: DesktopEntries.heuristicLookup(modelData)
                     implicitWidth: 36
                     implicitHeight: 36
                     Accessible.name: entry ? entry.name : "Application unavailable"
+                    enabled: entry !== null
                     onClicked: if (entry) entry.execute()
                     contentItem: IconImage { source: entry ? entry.icon : "application-x-executable"; implicitWidth: 21; implicitHeight: 21 }
                     background: Rectangle { radius: 11; color: parent.hovered ? "#704d5c8a" : "#33334568"; border.color: "#276b82bd"; border.width: 1 }
