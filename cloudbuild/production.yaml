@@ -58,6 +58,17 @@ steps:
       - -ceu
       - |
         service_url="$(gcloud run services describe '${_SERVICE}' --region='${_REGION}' --format='value(status.url)')"
-        curl --fail --show-error --retry 8 --retry-delay 5 "$${service_url}/healthz"
+        SERVICE_URL="$${service_url}/healthz" python3 - <<'PY'
+        import os, time, urllib.request
+        url = os.environ["SERVICE_URL"]
+        for attempt in range(8):
+            try:
+                print(urllib.request.urlopen(url, timeout=10).read().decode())
+                break
+            except Exception:
+                if attempt == 7:
+                    raise
+                time.sleep(5)
+        PY
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/backend:$COMMIT_SHA"
