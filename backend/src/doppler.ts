@@ -4,12 +4,16 @@ export async function loadDopplerSecrets(env: NodeJS.ProcessEnv = process.env): 
   if (!token) return;
   const project = env.DOPPLER_PROJECT;
   const config = env.DOPPLER_CONFIG ?? 'prd';
+  const secrets = [...new Set((env.DOPPLER_SECRETS ?? '').split(',').map((name) => name.trim()).filter(Boolean))];
+  if (!secrets.length) return;
+  if (secrets.some((name) => !/^[A-Z][A-Z0-9_]*$/.test(name))) throw new Error('DOPPLER_SECRETS must contain comma-separated environment variable names');
   if (!project) throw new Error('DOPPLER_PROJECT is required when DOPPLER_TOKEN is set');
 
   const url = new URL('https://api.doppler.com/v3/configs/config/secrets/download');
   url.searchParams.set('project', project);
   url.searchParams.set('config', config);
   url.searchParams.set('format', 'json');
+  url.searchParams.set('secrets', secrets.join(','));
   const response = await fetch(url, {
     headers: { Authorization: "Bearer " + token },
     signal: AbortSignal.timeout(10_000),
@@ -20,6 +24,7 @@ export async function loadDopplerSecrets(env: NodeJS.ProcessEnv = process.env): 
     throw new Error('Doppler returned an invalid secrets document');
   }
   for (const [key, entry] of Object.entries(downloaded)) {
+    if (!secrets.includes(key)) continue;
     const value = typeof entry === 'string'
       ? entry
       : typeof entry === 'object' && entry !== null && 'computed' in entry && typeof entry.computed === 'string'

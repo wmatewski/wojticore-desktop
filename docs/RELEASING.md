@@ -1,38 +1,31 @@
-# RPM release process
+# RPM releases and CI
 
-## Package and repository layout
+## Workflows
 
-Each packages/<name>/ directory has an independent spec and source. glass-desktop is a dependency-only meta package. Runtime modules and session files are split across glass-ui, glass-shell, glass-dock, glass-topbar, glass-launcher and glass-hyprland-config.
+- `Main CI` runs on pull requests and pushes to `main`. It checks backend, frontend and RPMs only when their files changed. The `Main CI / gate` check is required for merging.
+- Changes under `backend/**` or `cloudbuild/**` also start the Cloud Build trigger and deploy the backend after the main push.
+- RPM changes build only the changed package and the transitive RPM consumers whose exact dependency versions must match. A change to `glass-ui` rebuilds its consumers; a `glass-hyprland-config`-only change builds that package alone.
+- Pushes to `main` publish selected RPMs to Development. Tags `vX.Y.Z` publish selected RPMs to Stable; the tag must point to a commit on `main`.
+- Frontend pushes deploy only when the `DEPLOY_FRONTEND` environment variable is `true`.
 
-## Development and Stable
+The publisher downloads the existing channel repository before regenerating its DNF metadata, so publishing one module retains previously published packages. RPMs and repository metadata are signed before the channel manifest is updated.
 
-- Pushes to main publish Development after CI passes.
-- A vX.Y.Z tag publishes Stable after CI passes.
-- RPMs and repository metadata are signed with the same public key distributed to users.
-- The publisher uploads RPMs and signed repomd.xml first, then writes the API latest.json pointer. Enable bucket object versioning so operators can restore a previous pointer and metadata generation.
+## Doppler configuration
 
-GitHub Actions requires these repository variables/secrets:
+The Doppler project/config used by publishing must contain:
 
 | Name | Kind | Purpose |
 |---|---|---|
-| DOPPLER_DESKTOP_TOKEN | secret | Read-only token scoped to the RPM signing config |
-| DOPPLER_CONFIG | variable | Doppler config, default prd |
-| GCP_WIF_PROVIDER | variable | Workload Identity Federation provider resource name |
-| GCP_PUBLISHER_SERVICE_ACCOUNT | variable | Dedicated service account used by RPM publication |
-| GCS_BUCKET | variable | Public repository bucket |
-| DEPLOY_FRONTEND | variable | Set to true after Cloudflare setup |
-| CLOUDFLARE_ACCOUNT_ID | variable | Cloudflare account ID |
-| CF_API_TOKEN | secret | Cloudflare token restricted to Workers script deployment |
+| `RELEASES_BUCKET` | configuration | Public release bucket name, selectively loaded by the backend |
+| `RPM_GPG_PRIVATE_KEY` | secret | ASCII-armored private key used for RPM and metadata signatures |
+| `RPM_GPG_KEY_ID` | secret | GPG key ID matching the private key |
 
-The Doppler config must contain RPM_GPG_PRIVATE_KEY (ASCII armored key) and RPM_GPG_KEY_ID. Keep this signing key separate from the Cloud Build Doppler service token. Never print downloaded secret values or commit the key.
+The `prd` GitHub Actions environment contains `DOPPLER_DESKTOP_TOKEN`, a read-only Doppler service token. Do not store Google Cloud account JSON in Doppler. GitHub uses Workload Identity Federation for GCP and Cloud Run uses its attached service account for ADC.
 
-## Manual repository setup
+RPM publication remains disabled while `PUBLISH_RPMS=false`. After adding both `RPM_GPG_PRIVATE_KEY` and `RPM_GPG_KEY_ID` to the Doppler `prd` config and verifying the public signing key is published with the repository, set the `prd` environment variable `PUBLISH_RPMS=true` to enable Development and Stable publication.
 
-1. Create a public GCS bucket and enable uniform bucket-level access and object versioning.
-2. Upload the exported RPM public key to keys/RPM-GPG-KEY-wojticore.
-3. Grant anonymous read access only for the public artifacts bucket. Do not grant public write access.
-4. Create a Workload Identity Federation provider for GitHub Actions. Bind only this repository and the publication workflow to the dedicated publisher account.
-5. Grant that account roles/storage.objectAdmin on the RPM bucket so it can create RPM objects and replace the changing repository metadata and latest manifest. It does not need project-wide Storage Admin.
-6. Add the GitHub variables/secrets above, then run the RPM workflow manually against Development before creating a Stable tag. Protect v* tags with a repository ruleset so only release maintainers can publish Stable.
+## GitHub configuration
 
-publish-rpms.sh duplicates the architecture-independent alpha packages into x86_64 and aarch64 repositories. If architecture-specific binaries are introduced, change the builder/publisher to select matching RPM architectures before publishing.
+The `prd` environment provides `GCP_WIF_PROVIDER`, `GCP_PUBLISHER_SERVICE_ACCOUNT`, `GCS_BUCKET`, `DOPPLER_DESKTOP_TOKEN`, and optional Cloudflare deployment values. See [Google Cloud backend](GOOGLE_CLOUD.md) for their names and scopes.
+
+The RPM publisher identity is restricted to the release bucket and this repository's GitHub OIDC identity. Its bucket role is `roles/storage.objectAdmin` because it replaces signed DNF metadata and channel manifests. Runtime and build service identities are separate; see the Google Cloud guide for each role.

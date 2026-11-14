@@ -4,12 +4,12 @@ Release:        1%{?dist}
 Summary:        Wojticore Glass Desktop meta package
 License:        MIT
 BuildArch:      noarch
-Requires:       glass-shell = %{version}-%{release}
-Requires:       glass-ui = %{version}-%{release}
-Requires:       glass-dock = %{version}-%{release}
-Requires:       glass-topbar = %{version}-%{release}
-Requires:       glass-launcher = %{version}-%{release}
-Requires:       glass-hyprland-config = %{version}-%{release}
+Requires:       glass-shell
+Requires:       glass-ui
+Requires:       glass-dock
+Requires:       glass-topbar
+Requires:       glass-launcher
+Requires:       glass-hyprland-config
 
 %description
 Installs the modular Wojticore Glass Desktop session.

@@ -6,14 +6,14 @@ options:
   logging: CLOUD_LOGGING_ONLY
 substitutions:
   _REGION: europe-west1
-  _AR_REPOSITORY: desktop
+  _AR_REPOSITORY: wojticore
   _SERVICE: wojticore-desktop-backend
-  _BUILD_SERVICE_ACCOUNT: cloud-build-desktop@wojticore-desktop.iam.gserviceaccount.com
-  _RUNTIME_SERVICE_ACCOUNT: desktop-runtime@wojticore-desktop.iam.gserviceaccount.com
+  _BUILD_SERVICE_ACCOUNT: desktop-build@wojticore-dev.iam.gserviceaccount.com
+  _RUNTIME_SERVICE_ACCOUNT: desktop-runtime@wojticore-dev.iam.gserviceaccount.com
   _DOPPLER_TOKEN_SECRET: DOPPLER_DESKTOP_TOKEN
   _DOPPLER_PROJECT: wojticore-desktop
   _DOPPLER_CONFIG: prd
-  _RELEASES_BUCKET: wojticore-desktop-releases
+  _RELEASES_BUCKET: wojticore-desktop-releases-dev-952788006008
 steps:
   - id: test-backend
     name: node:22
@@ -41,7 +41,7 @@ steps:
       - --platform=managed
       - --service-account=${_RUNTIME_SERVICE_ACCOUNT}
       - --allow-unauthenticated
-      - --set-env-vars=RELEASES_BUCKET=${_RELEASES_BUCKET},DOPPLER_PROJECT=${_DOPPLER_PROJECT},DOPPLER_CONFIG=${_DOPPLER_CONFIG}
+      - --set-env-vars=RELEASES_BUCKET=${_RELEASES_BUCKET},DOPPLER_PROJECT=${_DOPPLER_PROJECT},DOPPLER_CONFIG=${_DOPPLER_CONFIG},DOPPLER_SECRETS=RELEASES_BUCKET
       - --set-secrets=DOPPLER_TOKEN=${_DOPPLER_TOKEN_SECRET}:latest
       - --cpu=1
       - --memory=512Mi

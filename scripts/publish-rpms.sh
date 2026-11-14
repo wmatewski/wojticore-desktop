@@ -16,6 +16,9 @@ base_url="${PUBLIC_BASE_URL:-https://storage.googleapis.com/${GCS_BUCKET}}"
 for arch in x86_64 aarch64; do
   repo="$work/repos/$channel/$arch"
   mkdir -p "$repo"
+  if gsutil -q stat "gs://${GCS_BUCKET}/repos/$channel/$arch/repodata/repomd.xml" 2>/dev/null; then
+    gsutil -m rsync -r "gs://${GCS_BUCKET}/repos/$channel/$arch/" "$repo"
+  fi
   cp "$rpm_dir"/*.rpm "$repo/"
   createrepo_c --update "$repo"
   if [[ -n "${RPM_SIGNING_KEY_ID:-}" ]]; then

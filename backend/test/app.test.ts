@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createApp } from '../src/app.js';
+import { loadDopplerSecrets } from '../src/doppler.js';
 import type { ReleaseManifest, ReleaseStore } from '../src/releases.js';
 
 const manifest: ReleaseManifest = {
@@ -46,4 +47,24 @@ test('release lookup reports missing GCS objects and outages', async () => {
   const down = createApp(store(new Error('network')));
   assert.equal((await down.inject('/v1/releases/latest')).statusCode, 503);
   await down.close();
+});
+
+test('Doppler downloads only configured secret names', async () => {
+  const originalFetch = globalThis.fetch;
+  let requestedSecrets = '';
+  globalThis.fetch = async (input) => {
+    requestedSecrets = new URL(String(input)).searchParams.get('secrets') ?? '';
+    return new Response(JSON.stringify({ RELEASES_BUCKET: 'test-bucket', RPM_GPG_PRIVATE_KEY: 'must-not-load' }));
+  };
+  const env: NodeJS.ProcessEnv = {
+    DOPPLER_TOKEN: 'test-token', DOPPLER_PROJECT: 'test-project', DOPPLER_SECRETS: 'RELEASES_BUCKET',
+  };
+  try {
+    await loadDopplerSecrets(env);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.equal(requestedSecrets, 'RELEASES_BUCKET');
+  assert.equal(env.RELEASES_BUCKET, 'test-bucket');
+  assert.equal(env.RPM_GPG_PRIVATE_KEY, undefined);
 });
