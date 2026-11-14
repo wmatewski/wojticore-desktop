@@ -9,7 +9,7 @@ Requires:       hyprland
 Requires:       glass-shell = %{version}-%{release}
 Recommends:     swaybg
 Recommends:     kitty
-Recommends:     hyprland-qtutils
+Recommends:     hyprland-guiutils
 
 %description
 Adds a distinct Glass Desktop login session and per-user first-run config without modifying existing Hyprland settings.
