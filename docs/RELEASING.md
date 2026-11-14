@@ -8,7 +8,7 @@
 - Pushes to `main` publish selected RPMs to Development. Tags `vX.Y.Z` publish selected RPMs to Stable; the tag must point to a commit on `main`.
 - Frontend pushes deploy only when the `DEPLOY_FRONTEND` environment variable is `true`.
 
-The publisher downloads the existing channel repository before regenerating its DNF metadata, so publishing one module retains previously published packages. RPMs and repository metadata are signed before the channel manifest is updated.
+The publisher exports the imported key's public half to the bucket, then downloads the existing channel repository before regenerating its DNF metadata, so publishing one module retains previously published packages. RPMs and repository metadata are signed before the channel manifest is updated.
 
 ## Doppler configuration
 
@@ -23,6 +23,8 @@ The Doppler project/config used by publishing must contain:
 The `prd` GitHub Actions environment contains `DOPPLER_DESKTOP_TOKEN`, a read-only Doppler service token. Do not store Google Cloud account JSON in Doppler. GitHub uses Workload Identity Federation for GCP and Cloud Run uses its attached service account for ADC.
 
 RPM publication remains disabled while `PUBLISH_RPMS=false`. After adding both `RPM_GPG_PRIVATE_KEY` and `RPM_GPG_KEY_ID` to the Doppler `prd` config and verifying the public signing key is published with the repository, set the `prd` environment variable `PUBLISH_RPMS=true` to enable Development and Stable publication.
+
+Generate a signing key locally with `./scripts/generate-rpm-signing-key.sh`. It writes a 2-year RSA 4096 signing key under `~/.config/wojticore-desktop/rpm-signing/` with private files readable only by your user, then writes a JSON import payload to stdout. In Doppler project `wojticore-desktop`, config `prd`, choose **Import Secrets → JSON** and paste that JSON object to set `RPM_GPG_PRIVATE_KEY`, `RPM_GPG_KEY_ID`, and `RELEASES_BUCKET`. The key has no passphrase because the automated signer imports it unattended; protect the Doppler config and keep an offline backup. Do not commit or share the private key or terminal output; the publishing workflow uploads only its public key to GCS.
 
 ## GitHub configuration
 

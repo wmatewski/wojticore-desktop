@@ -14,7 +14,7 @@ const querySchema = {
 
 export function createApp(store: ReleaseStore) {
   const app = Fastify({ logger: false });
-  app.get('/healthz', async () => ({ status: 'ok' }));
+  app.get('/health', async () => ({ status: 'ok' }));
 
   app.get<{ Querystring: { channel?: Channel; architecture?: Architecture } }>(
     '/v1/releases/latest', { schema: { querystring: querySchema } }, async (request, reply) => {

@@ -3,6 +3,7 @@ set -euo pipefail
 
 : "${GCS_BUCKET:?Set GCS_BUCKET to the public RPM bucket}"
 : "${RELEASE_VERSION:?Set RELEASE_VERSION to a semver release, for example 0.1.0-alpha.1}"
+: "${RPM_SIGNING_KEY_ID:?Set RPM_SIGNING_KEY_ID to the signing key ID}"
 channel="${CHANNEL:-development}"
 [[ "$channel" == stable || "$channel" == development ]] || { echo 'CHANNEL must be stable or development.' >&2; exit 2; }
 command -v gsutil >/dev/null && command -v createrepo_c >/dev/null || { echo 'gsutil and createrepo_c are required.' >&2; exit 1; }
@@ -12,6 +13,9 @@ rpm_dir="${RPM_OUTPUT_DIR:-$root/dist/rpms}"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 base_url="${PUBLIC_BASE_URL:-https://storage.googleapis.com/${GCS_BUCKET}}"
+gpg --batch --armor --export "$RPM_SIGNING_KEY_ID" > "$work/RPM-GPG-KEY-wojticore"
+[[ -s "$work/RPM-GPG-KEY-wojticore" ]] || { echo 'Could not export the RPM public key.' >&2; exit 1; }
+gsutil cp "$work/RPM-GPG-KEY-wojticore" "gs://${GCS_BUCKET}/keys/RPM-GPG-KEY-wojticore"
 
 for arch in x86_64 aarch64; do
   repo="$work/repos/$channel/$arch"
@@ -21,12 +25,7 @@ for arch in x86_64 aarch64; do
   fi
   cp "$rpm_dir"/*.rpm "$repo/"
   createrepo_c --update "$repo"
-  if [[ -n "${RPM_SIGNING_KEY_ID:-}" ]]; then
-    gpg --batch --yes --local-user "$RPM_SIGNING_KEY_ID" --armor --detach-sign "$repo/repodata/repomd.xml"
-  else
-    echo 'RPM_SIGNING_KEY_ID is required for signed repository metadata.' >&2
-    exit 1
-  fi
+  gpg --batch --yes --local-user "$RPM_SIGNING_KEY_ID" --armor --detach-sign "$repo/repodata/repomd.xml"
   gsutil -m rsync -r "$repo" "gs://${GCS_BUCKET}/repos/$channel/$arch/"
   python3 - "$rpm_dir" "$channel" "$arch" "$RELEASE_VERSION" "$base_url" "$work/latest-$channel-$arch.json" <<'PY'
 import hashlib, json, pathlib, subprocess, sys, urllib.parse

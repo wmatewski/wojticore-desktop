@@ -33,7 +33,7 @@ gcloud builds repositories create wojticore-desktop \
   --project=wojticore-dev
 ```
 
-The deploy trigger uses `cloudbuild/production.yaml`, and its included file filter is `backend/**,cloudbuild/**`. The config builds the backend container, pushes the commit-SHA image to Artifact Registry, deploys Cloud Run with the runtime identity, and verifies `/healthz`.
+The deploy trigger uses `cloudbuild/production.yaml`, and its included file filter is `backend/**,cloudbuild/**`. The config builds the backend container, pushes the commit-SHA image to Artifact Registry, deploys Cloud Run with the runtime identity, and verifies `/health`.
 
 ## Doppler secrets
 
@@ -46,6 +46,8 @@ The Doppler project/config used by the publishing workflows must contain:
 | `RELEASES_BUCKET` | Public release bucket name; the backend allowlists this value only |
 | `RPM_GPG_PRIVATE_KEY` | ASCII-armored private key used to sign RPM packages and repository metadata |
 | `RPM_GPG_KEY_ID` | GPG key ID matching the signing key |
+
+The publishing workflow exports the matching public key to `gs://<bucket>/keys/RPM-GPG-KEY-wojticore`, the object used by the generated DNF repository configuration.
 
 Do not put a Google Cloud JSON key in Doppler. The current API reads only public release manifests from GCS and does not require another application secret. Keep the service token read-only and scoped to the config containing the signing material; use a separate restricted runtime token/config if the API later needs private Doppler values.
 
@@ -69,4 +71,4 @@ The protected `prd` environment must provide these variables to its publishing j
 - Confirm Cloud Run uses the runtime identity, bucket name, and `DOPPLER_DESKTOP_TOKEN` secret reference.
 - Confirm anonymous users can download release objects but cannot upload.
 - Bucket versioning allows restoring older DNF metadata and `channels/<channel>/<architecture>/latest.json` generations.
-- Cloud Run `/healthz` does not require GCS; release endpoints return `503` if GCS is unavailable.
+- Cloud Run `/health` does not require GCS; release endpoints return `503` if GCS is unavailable.
