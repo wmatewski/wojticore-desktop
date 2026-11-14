@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts.astro';
+---
+<Layout title="Installation — Wojticore Desktop">
+  <div class="site-shell"><header class="topnav"><a class="brand" href="/"><span class="brand-mark">W</span>Wojticore</a><nav class="nav-links"><a href="/#overview">Overview</a><a href="/installation/">Installation</a><a href="/packages/">Packages</a><a href="https://github.com/wmatewski/wojticore-desktop">GitHub</a></nav><a class="button button-primary nav-cta" href="/releases/">Releases</a></header>
+  <main class="page-main"><h1>Install Glass Desktop.</h1><p class="section-copy">The alpha installer supports Fedora Linux with Hyprland. It adds a separate login session and leaves existing desktop environments in place.</p>
+  <h2>Quick install</h2><pre class="code-block">curl -fsSL https://desktop.wojticore.eu/install.sh | sudo bash</pre>
+  <h2>Before you begin</h2><ul><li>Use a supported Fedora release.</li><li>Install Hyprland and a working Wayland login manager.</li><li>Review the installer source before running a downloaded shell script.</li></ul>
+  <h2>What the installer changes</h2><p>It configures the Wojticore RPM repository and installs the Glass Desktop packages. Your existing Hyprland, KDE and GNOME configurations are not replaced. A new <code>Glass Desktop</code> session appears in the login screen when the display manager discovers the session file.</p>
+  <h2>Manual installation</h2><pre class="code-block">sudo dnf install 'dnf-command(config-manager)'
+sudo dnf config-manager addrepo --from-repofile=https://storage.googleapis.com/wojticore-desktop-releases/repos/development/wojticore-desktop.repo
+sudo dnf install glass-desktop</pre>
+  <p>Development packages are used during alpha testing. The Stable repository will be published after a signed stable release.</p></main>
+  <footer class="footer"><a class="brand" href="/"><span class="brand-mark">W</span>Wojticore</a><nav class="footer-links"><a href="/packages/">Packages</a><a href="/releases/">Releases</a><a href="https://github.com/wmatewski/wojticore-desktop">GitHub</a></nav></footer></div>
+</Layout>

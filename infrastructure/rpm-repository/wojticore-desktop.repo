@@ -1,0 +1,8 @@
+[wojticore-desktop-development]
+name=Wojticore Desktop (development)
+baseurl=https://storage.googleapis.com/wojticore-desktop-releases/repos/development/$basearch/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://storage.googleapis.com/wojticore-desktop-releases/keys/RPM-GPG-KEY-wojticore
+metadata_expire=5m

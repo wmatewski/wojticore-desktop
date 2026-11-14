@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/wojticore-glass"
+config_file="$config_dir/hyprland.conf"
+install -d -m 700 "$config_dir"
+if [[ ! -e "$config_file" ]]; then
+  install -m 600 /usr/share/wojticore-glass/default-hyprland.conf "$config_file"
+fi
+export QML_IMPORT_PATH="/usr/share/wojticore-glass/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+exec Hyprland --config "$config_file"

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.rpm
+*.src.rpm
+rpmbuild/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+.astro/

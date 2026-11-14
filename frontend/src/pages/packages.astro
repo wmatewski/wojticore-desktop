@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts.astro';
+const packages = [
+  ['glass-desktop', 'Meta package for the complete Glass session.', 'Required'],
+  ['glass-shell', 'Quickshell session entrypoint and shared runtime files.', 'Required'],
+  ['glass-ui', 'Shared QML colors, typography and glass components.', 'Required'],
+  ['glass-topbar', 'Workspace and system status panel.', 'Required'],
+  ['glass-dock', 'Floating application dock.', 'Required'],
+  ['glass-launcher', 'Keyboard-first search over installed desktop entries.', 'Required'],
+  ['glass-hyprland-config', 'Isolated Hyprland session and wallpaper.', 'Required'],
+];
+---
+<Layout title="Packages — Wojticore Desktop">
+  <div class="site-shell"><header class="topnav"><a class="brand" href="/"><span class="brand-mark">W</span>Wojticore</a><nav class="nav-links"><a href="/#overview">Overview</a><a href="/installation/">Installation</a><a href="/packages/">Packages</a><a href="https://github.com/wmatewski/wojticore-desktop">GitHub</a></nav><a class="button button-primary nav-cta" href="/installation/">Get started</a></header>
+  <main class="page-main"><h1>Small packages.<br />One cohesive session.</h1><p class="section-copy">Glass Desktop is assembled from independent RPMs. Each component can be built and updated on its own.</p>
+  <div class="package-list">{packages.map(([name, description, status]) => <div class="package-row"><strong>{name}</strong><span>{description}</span><span>{status} · 0.1.0 Alpha</span></div>)}</div>
+  <h2>Coming later</h2><p>Glass Files, Glass Terminal, Glass Settings, Glass Updates and the Control Center are planned as optional packages. They are not included in this alpha.</p>
+  <p><a class="button button-primary" href="https://github.com/wmatewski/wojticore-desktop/tree/main/packages">Browse package sources</a></p></main>
+  <footer class="footer"><a class="brand" href="/"><span class="brand-mark">W</span>Wojticore</a><nav class="footer-links"><a href="/installation/">Installation</a><a href="/releases/">Releases</a><a href="https://github.com/wmatewski/wojticore-desktop">GitHub</a></nav></footer></div>
+</Layout>

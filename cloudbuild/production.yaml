@@ -1,0 +1,63 @@
+# Trigger this file from the existing Cloud Build 2nd gen GitHub connection.
+# DOPPLER_TOKEN is mounted from Secret Manager into Cloud Run at deploy time;
+# no secret values enter the image or build logs.
+serviceAccount: projects/$PROJECT_ID/serviceAccounts/${_BUILD_SERVICE_ACCOUNT}
+options:
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _REGION: europe-west1
+  _AR_REPOSITORY: desktop
+  _SERVICE: wojticore-desktop-backend
+  _BUILD_SERVICE_ACCOUNT: cloud-build-desktop@wojticore-desktop.iam.gserviceaccount.com
+  _RUNTIME_SERVICE_ACCOUNT: desktop-runtime@wojticore-desktop.iam.gserviceaccount.com
+  _DOPPLER_TOKEN_SECRET: DOPPLER_DESKTOP_TOKEN
+  _DOPPLER_PROJECT: wojticore-desktop
+  _DOPPLER_CONFIG: prd
+  _RELEASES_BUCKET: wojticore-desktop-releases
+steps:
+  - id: test-backend
+    name: node:22
+    entrypoint: bash
+    args: [-ceu, "cd backend && npm ci && npm test && npm run build"]
+  - id: build-backend
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/backend:$COMMIT_SHA
+      - --file=backend/Dockerfile
+      - backend
+  - id: push-backend
+    name: gcr.io/cloud-builders/docker
+    args: [push, "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/backend:$COMMIT_SHA"]
+  - id: deploy-backend
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:stable
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/backend:$COMMIT_SHA
+      - --region=${_REGION}
+      - --platform=managed
+      - --service-account=${_RUNTIME_SERVICE_ACCOUNT}
+      - --allow-unauthenticated
+      - --set-env-vars=RELEASES_BUCKET=${_RELEASES_BUCKET},DOPPLER_PROJECT=${_DOPPLER_PROJECT},DOPPLER_CONFIG=${_DOPPLER_CONFIG}
+      - --set-secrets=DOPPLER_TOKEN=${_DOPPLER_TOKEN_SECRET}:latest
+      - --cpu=1
+      - --memory=512Mi
+      - --min=0
+      - --max=5
+      - --concurrency=80
+      - --timeout=30
+      - --port=8080
+      - --quiet
+  - id: verify-health
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:stable
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        service_url="$(gcloud run services describe '${_SERVICE}' --region='${_REGION}' --format='value(status.url)')"
+        curl --fail --show-error --retry 8 --retry-delay 5 "$${service_url}/healthz"
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/backend:$COMMIT_SHA"

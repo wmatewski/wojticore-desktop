@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Glass Desktop
+Comment=Wojticore Glass session based on Hyprland and Quickshell
+Exec=glass-session
+TryExec=glass-session
+Type=Application
+DesktopNames=Hyprland

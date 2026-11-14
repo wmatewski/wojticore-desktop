@@ -1,0 +1,4 @@
+module GlassUI
+singleton Theme 1.0 Theme.qml
+GlassCard 1.0 GlassCard.qml
+GlassButton 1.0 GlassButton.qml
