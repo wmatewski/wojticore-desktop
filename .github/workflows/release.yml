@@ -64,13 +64,17 @@ jobs:
   publish:
     name: Stable release / Sign and publish RPMs
     needs: [changes, build]
-    if: needs.changes.outputs.packages != '' && vars.PUBLISH_RPMS == 'true'
+    if: needs.changes.outputs.packages != ''
     runs-on: ubuntu-latest
     environment: prd
     permissions:
       contents: read
       id-token: write
     steps:
+      - name: Verify RPM publication is enabled
+        env:
+          PUBLISH_RPMS: ${{ vars.PUBLISH_RPMS }}
+        run: test "$PUBLISH_RPMS" = true
       - name: Check out publication scripts
         uses: actions/checkout@v7
       - name: Set up Google Cloud Workload Identity Federation

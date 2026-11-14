@@ -155,13 +155,17 @@ jobs:
   publish-development:
     name: Development / Sign and publish RPMs
     needs: [changes, rpms]
-    if: (github.event_name == 'push' || inputs.publish_development) && needs.changes.outputs.rpms != '' && vars.PUBLISH_RPMS == 'true'
+    if: (github.event_name == 'push' || inputs.publish_development) && needs.changes.outputs.rpms != ''
     runs-on: ubuntu-latest
     environment: prd
     permissions:
       contents: read
       id-token: write
     steps:
+      - name: Verify RPM publication is enabled
+        env:
+          PUBLISH_RPMS: ${{ vars.PUBLISH_RPMS }}
+        run: test "$PUBLISH_RPMS" = true
       - name: Check out publication scripts
         uses: actions/checkout@v7
       - name: Set up Google Cloud Workload Identity Federation
