@@ -24,6 +24,8 @@ The `prd` GitHub Actions environment contains `DOPPLER_DESKTOP_TOKEN`, a read-on
 
 RPM publication remains disabled while `PUBLISH_RPMS=false`. After adding both `RPM_GPG_PRIVATE_KEY` and `RPM_GPG_KEY_ID` to the Doppler `prd` config and verifying the public signing key is published with the repository, set the `prd` environment variable `PUBLISH_RPMS=true` to enable Development and Stable publication.
 
+Generate a signing key locally with `./scripts/generate-rpm-signing-key.sh`. It writes a 2-year RSA 4096 signing key under `~/.config/wojticore-desktop/rpm-signing/` with private files readable only by your user. The key has no passphrase because the automated signer imports it unattended; protect the Doppler config and keep an offline backup. In Doppler project `wojticore-desktop`, config `prd`, create `RPM_GPG_PRIVATE_KEY` from `private-key.asc`, `RPM_GPG_KEY_ID` from `key-id.txt`, and configuration value `RELEASES_BUCKET=wojticore-desktop-releases-dev-952788006008`. Do not commit or send `private-key.asc`; the publishing workflow uploads only its public key to GCS.
+
 ## GitHub configuration
 
 The `prd` environment provides `GCP_WIF_PROVIDER`, `GCP_PUBLISHER_SERVICE_ACCOUNT`, `GCS_BUCKET`, `DOPPLER_DESKTOP_TOKEN`, and optional Cloudflare deployment values. See [Google Cloud backend](GOOGLE_CLOUD.md) for their names and scopes.
