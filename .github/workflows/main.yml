@@ -120,7 +120,7 @@ jobs:
         run: npm run build
       - name: Upload site assets for deployment
         if: github.event_name == 'push' && vars.DEPLOY_FRONTEND == 'true'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-site
           path: frontend/dist
@@ -145,7 +145,7 @@ jobs:
         run: ./scripts/build-rpms.sh
       - name: Upload RPM artifacts for Development publication
         if: github.event_name == 'push' || inputs.publish_development
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: development-rpms
           path: dist/rpms/*.rpm
