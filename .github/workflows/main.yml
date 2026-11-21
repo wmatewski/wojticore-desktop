@@ -178,7 +178,7 @@ jobs:
       - name: Install RPM repository tools
         run: sudo apt-get update && sudo apt-get install -y createrepo-c rpm
       - name: Download selected RPM packages
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: development-rpms
           path: dist/rpms
@@ -228,7 +228,7 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Download built site assets
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: frontend-site
           path: frontend/dist
