@@ -54,7 +54,7 @@ jobs:
           RPM_VERSION: ${{ needs.changes.outputs.version }}
         run: ./scripts/build-rpms.sh
       - name: Upload RPM artifacts for Stable publication
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: stable-rpms
           path: dist/rpms/*.rpm
